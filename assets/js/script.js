@@ -34,22 +34,47 @@ if (botonMenu && menuMovil) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const proporcion = 4 / 3;
+  let canvasWidth = canvas.width;
+  let canvasHeight = canvas.height;
+  let resizePending = false;
 
   // Ajusta el tamaño del canvas según el ancho disponible
   const redimensionar = () => {
     const ancho = Math.min(canvas.parentElement?.clientWidth || 520, 520);
     const alto = Math.round(ancho / proporcion);
-    canvas.width = ancho;
-    canvas.height = alto;
+
+    if (ancho !== canvasWidth || alto !== canvasHeight) {
+      canvasWidth = ancho;
+      canvasHeight = alto;
+      canvas.width = ancho;
+      canvas.height = alto;
+    } else {
+      canvasWidth = ancho;
+      canvasHeight = alto;
+    }
+  };
+
+  const solicitarRedimension = () => {
+    if (resizePending) return;
+    resizePending = true;
+    requestAnimationFrame(() => {
+      resizePending = false;
+      redimensionar();
+    });
   };
 
   redimensionar();
-  window.addEventListener('resize', redimensionar);
+  window.addEventListener('resize', solicitarRedimension);
+
+  if (window.ResizeObserver && canvas.parentElement) {
+    const observer = new ResizeObserver(solicitarRedimension);
+    observer.observe(canvas.parentElement);
+  }
 
   let t = 0;
   const dibujar = () => {
-    redimensionar();
-    const { width: w, height: h } = canvas;
+    const w = canvasWidth || canvas.width;
+    const h = canvasHeight || canvas.height;
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, w, h);
 
