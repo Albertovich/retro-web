@@ -22,6 +22,8 @@ body {
   background: var(--fondo);
   color: var(--texto);
   line-height: 1.6;
+  font-family: "Press Start 2P", system-ui, sans-serif;
+  font-size: clamp(12px, 1.3vw, 14px);
 }
 
 a {
@@ -194,8 +196,11 @@ a {
 
 /* Botones principales */
 .boton {
-  display: inline-block;
-  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+  padding: 12px 18px;
   background: var(--amarillo);
   color: #000;
   border: 2px solid #000;
@@ -204,6 +209,8 @@ a {
   font: inherit;
   text-transform: uppercase;
   letter-spacing: 1px;
+  text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .boton:hover {
@@ -261,6 +268,8 @@ a {
 .rejilla {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   justify-items: center;
+  margin-inline: auto;
+  width: min(100%, 960px);
 }
 
 .tarjetas li,
@@ -329,6 +338,7 @@ a {
 
 .formulario .boton {
   justify-self: center;
+  width: clamp(180px, 60%, 240px);
 }
 
 .nota {
