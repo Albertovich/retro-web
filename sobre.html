@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sobre mí · Retro Web</title>
+  <meta name="description" content="Conoce a Alberto y su universo arcade" />
+  <meta property="og:title" content="Sobre mí · Retro Web" />
+  <meta property="og:description" content="Conoce a Alberto y su universo arcade" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/assets/img/og-banner.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/assets/img/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <h1>Sobre mí</h1>
+  <p class="lead">Hola terrícula! Soy Alberto, artista digital inspirado en la estética retro y en los videojuegos de 8 bits. Este es mi aportación creativa para mostrar ilustraciones y proyectos con alma arcade. Bienvenido!</p>
+
+  <div class="about-grid">
+    <div>
+      <h2>Filosofía</h2>
+      <p>La nostalgia puede ser innovadora: recreo sensaciones clásicas con técnicas modernas.</p>
+    </div>
+    <div>
+      <h2>Tecnologías</h2>
+      <p>p5.js, HTML, CSS, JavaScript. A veces toques de shaders o audio chiptune.</p>
+    </div>
+  </div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pac-Man Remix · Retro Web</title>
+  <meta name="description" content="El laberinto sigue ahí, pero los fantasmas ahora bailan synthwave." />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    main .canvas-wrap{border:1px solid var(--border);padding:8px;background:rgba(255,255,255,0.02)}
+  </style>
+</head>
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <a class="btn" href="/portafolio.html">← Volver al portafolio</a>
+  <h1>Pac-Man Remix</h1>
+  <p class="lead">El laberinto sigue ahí, pero los fantasmas ahora bailan synthwave.</p>
+  <div class="canvas-wrap" id="canvas-wrap"></div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>
+
+
+<script>
+/*
+  PAC-MAN REMIX · EFECTO VISUAL (p5.js)
+  -------------------------------------
+  Homenaje artístico al arcade de los 80:
+  - Laberinto geométrico simplificado con líneas neón.
+  - Pac-Man amarillo con boca animada (loop).
+  - Fantasmas synthwave flotando.
+  - Píldoras que brillan y desaparecen al paso.
+  - Comentarios en español "humanos".
+*/
+
+let sketch = (p) => {
+  // ===== COLORES NEÓN RETRO =====
+  const COL = {
+    bg: p.color(0,0,0),
+    maze: p.color(0,180,255),   // azul neón
+    pacman: p.color(255,255,0), // amarillo
+    pellet: p.color(255,255,255),
+    ghostR: p.color(255, 0, 0),
+    ghostP: p.color(255, 105, 180),
+    ghostC: p.color(0, 255, 255),
+    ghostO: p.color(255, 165, 0)
+  };
+
+  // ===== GEO Y ESTADO =====
+  let pellets = []; // lista de píldoras
+  let path = [];    // ruta por la que se mueve Pac-Man
+  let ghosts = [];  // posiciones de fantasmas
+  let pacT = 0;     // parámetro (0..1) para mover Pac-Man a lo largo del path (loop)
+
+  function canvasSize() {
+    const wrap = document.getElementById('canvas-wrap');
+    const w = Math.min(900, wrap.clientWidth - 16);
+    return [w, Math.round(w * 0.62)];
+  }
+
+  p.setup = () => {
+    const [w,h] = canvasSize();
+    p.createCanvas(w,h).parent('canvas-wrap');
+    p.noSmooth();
+
+    // Construcción de un "laberinto" minimalista en forma de camino cerrado
+    // Para mantenerlo artístico y limpio, creamos un rectángulo con esquinas y algunos puentes internos.
+    const margin = 36;
+    const r = [
+      p.createVector(margin, margin),
+      p.createVector(p.width - margin, margin),
+      p.createVector(p.width - margin, p.height - margin),
+      p.createVector(margin, p.height - margin),
+    ];
+
+    // Rellenamos path: recorrer los segmentos del rectángulo + un "puente" interno
+    function addSegment(a,b,steps) {
+      for (let i=0;i<=steps;i++) {
+        const t = i/steps;
+        path.push(p5.Vector.lerp(a,b,t));
+      }
+    }
+    const stepsPerSide = 90;
+    addSegment(r[0], r[1], stepsPerSide);
+    addSegment(r[1], r[2], stepsPerSide);
+    addSegment(r[2], r[3], stepsPerSide);
+    addSegment(r[3], r[0], stepsPerSide);
+
+    // puentes diagonales internos para hacerlo menos "cuadrado" y más dinámico
+    addSegment(p.createVector(p.width*0.3, margin+10), p.createVector(p.width*0.7, margin+10), 50);
+    addSegment(p.createVector(p.width*0.7, p.height-margin-10), p.createVector(p.width*0.3, p.height-margin-10), 50);
+
+    // Píldoras a lo largo del path (una cada N puntos)
+    for (let i=0;i<path.length;i+=16){
+      pellets.push({ pos: path[i].copy(), eaten: false, glow: p.random(0.5,1) });
+    }
+
+    // Fantasmas: los distribuimos con desfases para que no vayan juntos
+    ghosts = [
+      { col: COL.ghostR, t: 0.1 },
+      { col: COL.ghostP, t: 0.35 },
+      { col: COL.ghostC, t: 0.6 },
+      { col: COL.ghostO, t: 0.85 },
+    ];
+  };
+
+  p.windowResized = () => {
+    const [w,h] = canvasSize();
+    p.resizeCanvas(w,h);
+  };
+
+  p.draw = () => {
+    p.background(COL.bg);
+
+    // ===== LABERINTO (líneas con "glow") =====
+    p.stroke(COL.maze);
+    p.strokeWeight(2);
+    p.noFill();
+    // Bordes rectangulares
+    p.rect(28, 28, p.width-56, p.height-56);
+    // Puentes internos
+    horizontalLine(p.width*0.3, 38, p.width*0.7, 38);
+    horizontalLine(p.width*0.3, p.height-38, p.width*0.7, p.height-38);
+
+    // ===== PÍLDORAS (brillo pulsante) =====
+    for (let pel of pellets) {
+      if (pel.eaten) continue;
+      const twinkle = 0.6 + 0.4 * p.sin(p.frameCount*0.05 + pel.glow*10);
+      p.noStroke();
+      p.fill(255,255,255, 255*twinkle);
+      p.rect(pel.pos.x, pel.pos.y, 4, 4);
+    }
+
+    // ===== PAC-MAN EN LOOP =====
+    pacT = (pacT + 0.003) % 1; // velocidad de avance
+    const pacPos = alongPath(pacT);
+    const pacDir = alongPath((pacT + 0.002) % 1).copy().sub(pacPos).heading();
+    drawPacman(pacPos.x, pacPos.y, pacDir);
+
+    // Al pasar, "come" píldoras cercanas
+    for (let pel of pellets) {
+      if (!pel.eaten && p5.Vector.dist(pacPos, pel.pos) < 10) pel.eaten = true;
+    }
+
+    // ===== FANTASMAS SYNTHWAVE =====
+    for (let g of ghosts) {
+      // flotan en torno al camino con una ligera oscilación
+      g.t = (g.t + 0.0025) % 1;
+      const base = alongPath(g.t);
+      const off = p.createVector(p.sin(p.frameCount*0.02 + g.t*10)*8, p.cos(p.frameCount*0.02 + g.t*10)*6);
+      drawGhost(base.x + off.x, base.y + off.y, g.col);
+    }
+
+    // ===== "RESPAWN" DE PÍLDORAS =====
+    // Cuando Pac-Man completa varias vueltas, reponemos las píldoras para que el loop no quede vacío.
+    if (p.frameCount % 1200 === 0) {
+      for (let pel of pellets) pel.eaten = false;
+    }
+
+    // ===== LIGERO EFECTO SCANLINE =====
+    p.stroke(0,255,0,40);
+    for (let y=0; y<p.height; y+=4) p.line(0,y,p.width,y);
+  };
+
+  // ========== UTILIDADES ==========
+
+  function horizontalLine(x1,y,x2,y2){
+    p.line(x1,y,x2,y2);
+    // "glow" sutil con alpha
+    p.stroke(0,180,255,50);
+    p.line(x1,y+1,x2,y2+1);
+    p.stroke(COL.maze);
+  }
+
+  function alongPath(t){
+    // t en [0,1) -> índice en path
+    const idx = Math.floor(t * path.length) % path.length;
+    return path[idx].copy();
+  }
+
+  function drawPacman(x,y,angle){
+    p.push();
+    p.translate(x,y);
+    p.rotate(angle);
+    p.noStroke();
+    // boca abriéndose y cerrándose
+    const mouth = (p.sin(p.frameCount*0.2)+1)/2; // 0..1
+    const open = p.map(mouth, 0, 1, p.radians(10), p.radians(50));
+    p.fill(COL.pacman);
+    p.arc(0,0,24,24, open, p.TWO_PI - open, p.PIE);
+    // ojo
+    p.fill(0);
+    p.rect(2,-6,2,2);
+    p.pop();
+  }
+
+  function drawGhost(x,y,col){
+    p.push();
+    p.translate(x,y);
+    p.noStroke();
+
+    // cuerpo con "glow" sutil
+    p.fill(p.red(col), p.green(col), p.blue(col), 60);
+    p.rect(-11,-12,22,18, 2);
+    p.fill(col);
+    p.rect(-10,-12,20,16, 2);
+    // borde inferior recortado con "piernas" cuadradas
+    p.fill(COL.bg);
+    p.rect(-10,2,20,2);
+    for (let i=-8; i<=8; i+=8) {
+      p.rect(i,2,4,4);
+    }
+    // ojos (mirada aleatoria suave)
+    const look = p.sin(p.frameCount*0.03)*2;
+    p.fill(255);
+    p.rect(-5,-7,6,6);
+    p.rect(3,-7,6,6);
+    p.fill(0,150);
+    p.rect(-4+look,-6,3,3);
+    p.rect(4+look,-6,3,3);
+    p.pop();
+  }
+};
+
+new p5(sketch);
+</script>
+
+</body>
+</html>

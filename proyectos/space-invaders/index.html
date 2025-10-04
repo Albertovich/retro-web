@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Space Invaders Recharged · Retro Web</title>
+  <meta name="description" content="Los marcianitos nunca pasan de moda, pero ahora disparan con ritmo ochentañero." />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    main .canvas-wrap{border:1px solid var(--border);padding:8px;background:rgba(255,255,255,0.02)}
+  </style>
+</head>
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <a class="btn" href="/portafolio.html">← Volver al portafolio</a>
+  <h1>Space Invaders Recharged</h1>
+  <p class="lead">Los marcianitos nunca pasan de moda, pero ahora disparan con ritmo ochentañero.</p>
+  <div class="canvas-wrap" id="canvas-wrap"></div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>
+
+
+<script>
+/*
+  SPACE INVADERS RECHARGED · EFECTO VISUAL (p5.js)
+  -------------------------------------------------
+  Objetivo: crear una escena animada que evoque Space Invaders
+  sin ser un juego jugable: starfield, formación de invasores
+  oscilando, disparos láser y pequeñas explosiones pixeladas.
+  Comentarios en español y con tono humano.
+*/
+
+let sketch = (p) => {
+  // ===== PALETA (neón arcade) =====
+  const COL = {
+    bg: p.color(0, 0, 0),
+    grid: p.color(0, 255, 0, 60),
+    inv: p.color(0, 255, 0),
+    invGlow: p.color(0, 255, 0, 40),
+    laser: p.color(255, 0, 255),
+    boom: p.color(255, 255, 0),
+    starA: p.color(255, 0, 255, 140),
+    starB: p.color(0, 255, 0, 140),
+    starC: p.color(255, 255, 0, 140),
+  };
+
+  // ===== ENTIDADES BÁSICAS =====
+  let stars = [];     // Campo de estrellas
+  let invaders = [];  // Formación de marcianitos
+  let lasers = [];    // Disparos que suben
+  let booms = [];     // Explosiones pixeladas
+  let t = 0;
+
+  // ===== AJUSTE RESPONSIVE =====
+  function canvasSize() {
+    const wrap = document.getElementById('canvas-wrap');
+    const w = Math.min(900, wrap.clientWidth - 16);
+    return [w, Math.round(w * 0.62)];
+  }
+
+  p.setup = () => {
+    const [w, h] = canvasSize();
+    p.createCanvas(w, h).parent('canvas-wrap');
+    p.noSmooth();
+
+    // Generamos un starfield con capas
+    for (let i = 0; i < 120; i++) {
+      stars.push({
+        x: p.random(p.width),
+        y: p.random(p.height),
+        z: p.random(1, 3) // capa (parallax)
+      });
+    }
+
+    // Formación de invasores (filas x columnas)
+    const rows = 5, cols = 10;
+    const margin = 28;
+    const cellW = (p.width - margin * 2) / cols;
+    const cellH = 28;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        invaders.push({
+          baseX: margin + c * cellW + cellW * 0.5,
+          baseY: 80 + r * cellH,
+          phase: p.random(1000) // desfase para el vaivén
+        });
+      }
+    }
+  };
+
+  p.windowResized = () => {
+    const [w, h] = canvasSize();
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = () => {
+    p.background(COL.bg);
+
+    // ===== CAPA 1: ESTRELLAS CON PARALLAX =====
+    drawStars();
+
+    // ===== CAPA 2: LINEAS DE HUD/REJILLA SUAVE (CRT vibes) =====
+    drawScanlines();
+
+    // ===== CAPA 3: INVASORES OSCILANDO =====
+    drawInvaders();
+
+    // ===== CAPA 4: LÁSERES Y EXPLOSIONES =====
+    updateLasers();
+    updateBooms();
+
+    // Cada cierto tiempo, lanzamos un láser desde la "nave" inferior
+    if (p.frameCount % 18 === 0) {
+      lasers.push({
+        x: p.width * 0.5 + p.sin(t * 0.03) * (p.width * 0.3),
+        y: p.height - 20,
+        v: -10 - p.random(2, 6)
+      });
+    }
+
+    t++;
+  };
+
+  // =========== DIBUJO / LÓGICA ===========
+
+  function drawStars() {
+    for (let s of stars) {
+      // desplazamiento vertical continuo (loop)
+      s.y += 0.2 * s.z;
+      if (s.y > p.height) s.y = 0;
+
+      // color por capa
+      let col = COL.starA;
+      if (s.z > 2.3) col = COL.starB;
+      else if (s.z > 1.6) col = COL.starC;
+
+      p.noStroke();
+      p.fill(col);
+      p.rect(Math.round(s.x), Math.round(s.y), s.z, s.z);
+    }
+  }
+
+  function drawScanlines() {
+    p.stroke(COL.grid);
+    // líneas horizontales finas tipo CRT
+    for (let y = 0; y < p.height; y += 4) {
+      p.line(0, y, p.width, y);
+    }
+  }
+
+  function drawInvaders() {
+    const sway = p.sin(t * 0.03) * 18;      // vaivén horizontal
+    const drop = p.sin(t * 0.015) * 6;      // ligera bajada/subida
+
+    for (let inv of invaders) {
+      const x = inv.baseX + sway + p.sin((t + inv.phase) * 0.05) * 4;
+      const y = inv.baseY + drop;
+
+      // "glow" sutil
+      p.noStroke();
+      p.fill(COL.invGlow);
+      p.rect(x - 10, y - 8, 20, 16);
+
+      // sprite pixelado (inspiración genérica)
+      p.fill(COL.inv);
+      drawInvaderSprite(Math.round(x), Math.round(y));
+    }
+  }
+
+  function drawInvaderSprite(cx, cy) {
+    // Sprite 11x8 "espejado" para ahorrar código
+    // 1 = pixel visible, 0 = vacío
+    const rows = [
+      "00111011100",
+      "01111111110",
+      "11101110111",
+      "11111111111",
+      "10111111101",
+      "10100100101",
+      "00011011000",
+      "00100000100"
+    ];
+    const size = 2; // tamaño de cada "pixel"
+
+    for (let j = 0; j < rows.length; j++) {
+      for (let i = 0; i < rows[j].length; i++) {
+        if (rows[j][i] === "1") {
+          const px = cx + (i - rows[j].length / 2) * size;
+          const py = cy + (j - rows.length / 2) * size;
+          p.rect(px, py, size, size);
+        }
+      }
+    }
+  }
+
+  function updateLasers() {
+    p.noStroke();
+    for (let i = lasers.length - 1; i >= 0; i--) {
+      const L = lasers[i];
+      p.fill(COL.laser);
+      // rayo principal
+      p.rect(L.x - 1, L.y, 2, 12);
+      // brillo lateral
+      p.fill(255, 0, 255, 80);
+      p.rect(L.x - 2, L.y, 1, 12);
+      p.rect(L.x + 1, L.y, 1, 12);
+
+      L.y += L.v;
+
+      // "colisiones" visuales: cuando el láser pasa por la banda de invasores
+      if (L.y < 180 && L.y > 70 && p.random() < 0.05) {
+        spawnBoom(L.x, L.y);
+      }
+
+      if (L.y < -20) lasers.splice(i, 1);
+    }
+  }
+
+  function spawnBoom(x, y) {
+    // pequeñas partículas cuadradas
+    for (let k = 0; k < 12; k++) {
+      booms.push({
+        x, y,
+        vx: p.random(-2, 2),
+        vy: p.random(-3, -0.5),
+        life: 30 + p.random(10)
+      });
+    }
+  }
+
+  function updateBooms() {
+    for (let i = booms.length - 1; i >= 0; i--) {
+      const B = booms[i];
+      p.fill(COL.boom);
+      p.noStroke();
+      p.rect(B.x, B.y, 3, 3);
+      B.x += B.vx;
+      B.y += B.vy;
+      B.vy += 0.08; // pequeña gravedad para caer
+      B.life--;
+      if (B.life <= 0) booms.splice(i, 1);
+    }
+  }
+};
+
+new p5(sketch);
+</script>
+
+</body>
+</html>

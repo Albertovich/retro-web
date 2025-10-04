@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Out Run Neo80 · Retro Web</title>
+  <meta name="description" content="Coge el Ferrari, pisa a fondo y recorre carreteras llenas de sol, palmeras y nostalgia." />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    main .canvas-wrap{border:1px solid var(--border);padding:8px;background:rgba(255,255,255,0.02)}
+  </style>
+</head>
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <a class="btn" href="/portafolio.html">← Volver al portafolio</a>
+  <h1>Out Run Neo80</h1>
+  <p class="lead">Coge el Ferrari, pisa a fondo y recorre carreteras llenas de sol, palmeras y nostalgia.</p>
+  <div class="canvas-wrap" id="canvas-wrap"></div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>
+
+
+<script>
+/*
+  OUT RUN NEO80 · EFECTO VISUAL (p5.js)
+  -------------------------------------
+  Homenaje artístico al clásico de carretera arcade:
+  - Horizonte synthwave con sol "a bandas".
+  - Carretera en perspectiva con líneas que avanzan.
+  - Rumble strips laterales alternando colores.
+  - Palmeras y carteles pasando con parallax.
+  - Silueta de "coche" en primer plano.
+  No es jugable, es un loop estético con espíritu 80s.
+  Comentarios en español con tono humano.
+*/
+
+let sketch = (p) => {
+  // ===== PALETA SINTÉTICA 80s =====
+  const COL = {
+    skyTop: p.color(10,0,25),     // cielo superior
+    skyBottom: p.color(60,0,90),  // cielo inferior
+    sunA: p.color(255,0,150),
+    sunB: p.color(255,180,0),
+    hill: p.color(30,0,50),
+    road: p.color(20,20,20),
+    lane: p.color(255,255,0),     // líneas centrales
+    edgeA: p.color(255,0,255),    // rumble strips magenta
+    edgeB: p.color(0,255,255),    // rumble strips cian
+    palm: p.color(0,255,0),       // palmeras
+    sign: p.color(255,255,255),   // carteles
+    car: p.color(255,0,100),      // coche estilizado
+    scan: p.color(0,255,0,40)
+  };
+
+  let t = 0;
+  let objects = []; // palmeras/carteles
+
+  function canvasSize(){
+    const wrap = document.getElementById('canvas-wrap');
+    const w = Math.min(900, wrap.clientWidth - 16);
+    return [w, Math.round(w*0.62)];
+  }
+
+  p.setup = () => {
+    const [w,h] = canvasSize();
+    p.createCanvas(w,h).parent('canvas-wrap');
+    p.noSmooth();
+
+    // poblar objetos laterales (palmeras/carteles)
+    for (let i=0;i<14;i++){
+      spawnObject(p.random(1)); // t0 ~ [0..1] para distribuirlos en profundidad
+    }
+  };
+
+  p.windowResized = () => {
+    const [w,h] = canvasSize();
+    p.resizeCanvas(w,h);
+  };
+
+  p.draw = () => {
+    drawSky();
+    drawSun();
+    drawHills();
+
+    drawRoad();
+    updateObjects();
+    drawCar();
+
+    // Scanlines sutiles para vibe CRT
+    p.stroke(COL.scan);
+    for (let y=0; y<p.height; y+=4) p.line(0,y,p.width,y);
+
+    t++;
+  };
+
+  // ===== CIELO / SOL / MONTAÑAS =====
+  function drawSky(){
+    // degradado vertical simple
+    for (let y=0; y<p.height; y++){
+      const k = y / p.height;
+      const c = p.lerpColor(COL.skyTop, COL.skyBottom, k);
+      p.stroke(c);
+      p.line(0,y,p.width,y);
+    }
+  }
+
+  function drawSun(){
+    const cx = p.width*0.5;
+    const cy = p.height*0.42;
+    const r = Math.min(p.width, p.height) * 0.22;
+    // Sol con bandas horizontales (synthwave)
+    for (let y=-r; y<=r; y+=4){
+      const yy = cy + y;
+      const k = (y+r)/(2*r);
+      const c = p.lerpColor(COL.sunA, COL.sunB, k);
+      p.stroke(c);
+      p.line(cx - Math.sqrt(r*r - y*y), yy, cx + Math.sqrt(r*r - y*y), yy);
+    }
+  }
+
+  function drawHills(){
+    // Siluetas de montañas al horizonte
+    p.noStroke();
+    p.fill(COL.hill);
+    const base = p.height*0.58;
+    for (let i=0;i<p.width;i+=24){
+      const hh = 14 + 10*p.sin((i+t*0.4)*0.02);
+      p.rect(i, base-hh, 24, hh + p.height*0.1);
+    }
+  }
+
+  // ===== CARRETERA Y PERSPECTIVA =====
+  function drawRoad(){
+    const horizon = p.height*0.62;
+    // ancho de carretera en horizonte y en primer plano
+    const roadTop = p.width*0.06;
+    const roadBottom = p.width*0.55;
+
+    // trapecio de la carretera
+    p.noStroke();
+    p.fill(COL.road);
+    p.quad(
+      p.width*0.5 - roadTop, horizon,
+      p.width*0.5 + roadTop, horizon,
+      p.width*0.5 + roadBottom, p.height,
+      p.width*0.5 - roadBottom, p.height
+    );
+
+    // líneas centrales/dash moviéndose
+    const dashLen = 22;
+    const speed = 10; // velocidad aparente
+    p.stroke(COL.lane);
+    p.strokeWeight(2);
+    for (let y = horizon; y < p.height; y += dashLen*2){
+      const k = (y - horizon) / (p.height - horizon);
+      const xL = p.lerp(p.width*0.5, p.width*0.5, k);
+      const halfW = p.lerp(roadTop*0.2, roadBottom*0.06, k);
+      // offset de movimiento
+      const off = (t*speed) % (dashLen*2);
+      p.line(p.width*0.5 - halfW, y + off, p.width*0.5 - halfW, y + off + dashLen);
+      p.line(p.width*0.5 + halfW, y + off, p.width*0.5 + halfW, y + off + dashLen);
+      // centro
+      p.line(p.width*0.5, y + off, p.width*0.5, y + off + dashLen);
+    }
+
+    // rumble strips laterales alternos
+    for (let y = horizon; y < p.height; y += 10){
+      const k = (y - horizon) / (p.height - horizon);
+      const edgeX = p.lerp(roadTop, roadBottom, k);
+      p.noStroke();
+      const c = Math.floor((y + (t*speed)%20) / 10) % 2 === 0 ? COL.edgeA : COL.edgeB;
+      p.fill(c);
+      // izquierda y derecha
+      const leftX = p.width*0.5 - edgeX - 6;
+      const rightX = p.width*0.5 + edgeX + 2;
+      const h = p.map(k, 0, 1, 2, 10); // más grandes cerca
+      p.rect(leftX, y, 6, h);
+      p.rect(rightX, y, 6, h);
+    }
+  }
+
+  // ===== OBJETOS LATERALES (PALMERAS / CARTELES) =====
+  function spawnObject(depthT=0){
+    // depthT en [0..1] donde 0 ~ horizonte y 1 ~ cerca
+    const side = Math.random()<0.5 ? -1 : 1; // izquierda/derecha
+    objects.push({
+      side,
+      z: depthT, // fracción de profundidad
+      kind: Math.random()<0.7 ? 'palm' : 'sign',
+      x: side * (0.12 + Math.random()*0.08), // x relativo a media carretera
+    });
+  }
+
+  function updateObjects(){
+    const horizon = p.height*0.62;
+    const roadTop = p.width*0.06;
+    const roadBottom = p.width*0.55;
+
+    for (let i=objects.length-1; i>=0; i--){
+      const O = objects[i];
+      // avanzar hacia el observador (aumenta z -> escala y desciende)
+      O.z += 0.01 + 0.005*Math.sin((t+i)*0.02);
+      if (O.z > 1.05){
+        objects.splice(i,1);
+        spawnObject(0); // respawn en horizonte
+        continue;
+      }
+
+      // Interpolamos posición según profundidad
+      const k = O.z; // 0..1
+      const roadHalf = p.lerp(roadTop, roadBottom, k);
+      const y = p.lerp(horizon, p.height, k);
+      const x = p.width*0.5 + O.x * roadHalf * 3; // 3x para separar más del asfalto
+      const s = p.map(k, 0, 1, 0.3, 2.4); // escala
+
+      if (O.kind === 'palm') drawPalm(x,y,s);
+      else drawSign(x,y,s);
+    }
+  }
+
+  function drawPalm(x,y,s){
+    p.push();
+    p.translate(x,y);
+    p.scale(s);
+    // tronco
+    p.noStroke();
+    p.fill(COL.palm);
+    p.rect(-2, -40, 4, 40);
+    // hojas (triángulos simples con “pixel art”)
+    for (let i=0;i<5;i++){
+      const ang = -p.HALF_PI + (i-2)*0.3 + p.sin((t+i)*0.05)*0.05;
+      const len = 20 + i*2;
+      const hx = Math.cos(ang)*len;
+      const hy = Math.sin(ang)*len;
+      p.rect(hx-2, -40+hy-2, 4, 4);
+      for (let j=6;j<len;j+=6){
+        const jx = Math.cos(ang)*j;
+        const jy = Math.sin(ang)*j;
+        p.rect(jx-2, -40+jy-2, 4, 4);
+      }
+    }
+    p.pop();
+  }
+
+  function drawSign(x,y,s){
+    p.push();
+    p.translate(x,y);
+    p.scale(s);
+    p.noStroke();
+    // poste
+    p.fill(200);
+    p.rect(-1,-30,2,30);
+    // cartel
+    p.fill(COL.sign);
+    p.rect(-10,-42,20,12);
+    // marco
+    p.fill(0,120);
+    p.rect(-9,-41,18,10);
+    p.pop();
+  }
+
+  // ===== COCHE EN PRIMER PLANO =====
+  function drawCar(){
+    const y = p.height - 26;
+    const x = p.width * 0.5;
+    p.noStroke();
+
+    // sombra/glow
+    p.fill(255,0,100,40);
+    p.rect(x-28, y-14, 56, 22);
+
+    // base
+    p.fill(COL.car);
+    p.rect(x-26, y-10, 52, 16, 2);
+    // cabina
+    p.rect(x-14, y-18, 28, 8, 2);
+    // faros traseros (neón)
+    p.fill(255, 0, 0);
+    p.rect(x-22, y+4, 6, 2);
+    p.rect(x+16, y+4, 6, 2);
+  }
+};
+
+new p5(sketch);
+</script>
+
+</body>
+</html>

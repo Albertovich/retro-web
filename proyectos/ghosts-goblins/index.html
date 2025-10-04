@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ghosts’n Goblins Revival · Retro Web</title>
+  <meta name="description" content="Sir Arthur vuelve, en calzoncillos pixelados, a enfrentarse a demonios imposibles." />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    main .canvas-wrap{border:1px solid var(--border);padding:8px;background:rgba(255,255,255,0.02)}
+  </style>
+</head>
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <a class="btn" href="/portafolio.html">← Volver al portafolio</a>
+  <h1>Ghosts’n Goblins Revival</h1>
+  <p class="lead">Sir Arthur vuelve, en calzoncillos pixelados, a enfrentarse a demonios imposibles.</p>
+  <div class="canvas-wrap" id="canvas-wrap"></div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>
+
+
+<script>
+/*
+  GHOSTS’N GOBLINS REVIVAL · EFECTO VISUAL (p5.js)
+  ------------------------------------------------
+  Homenaje artístico: cementerio neón, luna grande, fuegos fatuos
+  y un caballero pixelado corriendo en bucle. Todo muy 80s.
+  No hay juego: es una escena animada atmosférica.
+  Comentarios en español y con mimo.
+*/
+
+let sketch = (p) => {
+  // ===== PALETA GÓTICA-NEÓN =====
+  const COL = {
+    bg: p.color(0,0,8),             // negro azulado
+    moon: p.color(255, 255, 200),
+    ground: p.color(10,10,18),
+    hill: p.color(30, 0, 40),
+    hill2: p.color(15, 0, 25),
+    cross: p.color(0,255,255),      // cian para cruces/lápidas (toque neón)
+    knight: p.color(255,255,255),   // blanco para el “caballero” estilizado
+    boxer: p.color(255, 180, 180),  // toque pícaro para el pantalón si quieres verlo :)
+    wisp: p.color(255, 0, 255),     // fuegos fatuos magenta
+    mist: p.color(0,255,0,30),      // bruma verdosa suave
+    scan: p.color(0,255,0,45),      // scanlines
+  };
+
+  let wisps = [];  // fuegos fatuos
+  let t = 0;
+
+  function canvasSize(){
+    const wrap = document.getElementById('canvas-wrap');
+    const w = Math.min(900, wrap.clientWidth-16);
+    return [w, Math.round(w*0.62)];
+  }
+
+  p.setup = () => {
+    const [w,h] = canvasSize();
+    p.createCanvas(w,h).parent('canvas-wrap');
+    p.noSmooth();
+
+    // poblar algunos fuegos fatuos iniciales
+    for (let i=0;i<24;i++){
+      wisps.push({
+        x: p.random(w), y: p.random(h*0.25, h*0.8),
+        phase: p.random(1000), size: p.random(3,6)
+      });
+    }
+  };
+
+  p.windowResized = () => {
+    const [w,h] = canvasSize();
+    p.resizeCanvas(w,h);
+  };
+
+  p.draw = () => {
+    p.background(COL.bg);
+
+    drawMoon();
+    drawHills();
+    drawCemetery();
+    drawMist();
+
+    // caballero corriendo en “parallax” (suelo)
+    const baseY = p.height*0.78;
+    const runX = (p.frameCount*2) % (p.width+60) - 30; // recorre la pantalla
+    drawKnight(runX, baseY);
+
+    // fuegos fatuos flotando
+    updateWisps();
+
+    // scanlines finales
+    p.stroke(COL.scan);
+    for (let y=0;y<p.height;y+=4) p.line(0,y,p.width,y);
+
+    t++;
+  };
+
+  // ===== ELEMENTOS DE LA ESCENA =====
+
+  function drawMoon(){
+    // Luna grande con halo suave
+    const x = p.width*0.82, y = p.height*0.18;
+    p.noStroke();
+    for (let r=60; r>0; r-=4){
+      const a = p.map(r, 0, 60, 10, 220);
+      p.fill(255,255,200,a);
+      p.ellipse(x,y,r*2,r*2);
+    }
+    // unos cráteres discretos
+    p.fill(240,240,200,120);
+    p.rect(x-18,y-4,6,6);
+    p.rect(x+8,y+6,4,4);
+  }
+
+  function drawHills(){
+    // Capas de colinas al fondo, estilo silueta
+    p.noStroke();
+    p.fill(COL.hill2);
+    p.rect(0, p.height*0.7, p.width, p.height*0.3);
+    p.fill(COL.hill);
+    for (let i=0;i<p.width;i+=24){
+      const h = 20 + 10*p.sin((i+t)*0.02);
+      p.rect(i, p.height*0.68 - h, 24, h + p.height*0.32);
+    }
+  }
+
+  function drawCemetery(){
+    // Suelo
+    p.noStroke();
+    p.fill(COL.ground);
+    p.rect(0, p.height*0.78, p.width, p.height*0.22);
+
+    // Cruces y lápidas en “parallax”
+    p.stroke(COL.cross);
+    p.strokeWeight(2);
+    const rows = 2;
+    for (let r=0;r<rows;r++){
+      const y = p.height*0.76 - r*18;
+      for (let x=20; x<p.width; x+=60){
+        drawGrave(x + (r%2===0? 0 : 30), y);
+      }
+    }
+  }
+
+  function drawGrave(x,y){
+    // cruz simple
+    p.line(x, y-10, x, y+10);
+    p.line(x-6, y, x+6, y);
+    // lápida cuadrada cerca
+    p.noStroke();
+    p.fill(0,200);
+    p.rect(x+12, y+2, 12, 10);
+  }
+
+  function drawMist(){
+    // Bruma suave que se mueve en horizontal (añade atmósfera)
+    p.noStroke();
+    for (let i=0;i<6;i++){
+      const yy = p.height*0.74 + p.sin((t*0.01)+i)*6;
+      p.fill(0,255,0, 12 + i*3);
+      p.rect(-50 + (t*1.2 + i*80) % (p.width+100), yy, 120, 12);
+    }
+  }
+
+  // ===== PROTAGONISTA: CABALLERO ESTILIZADO =====
+  function drawKnight(x,y){
+    p.push();
+    p.translate(x,y);
+
+    // “rebote” leve como si corriera
+    const bob = p.sin(p.frameCount*0.3)*2;
+    p.translate(0, -bob);
+
+    // sombra/glow suave
+    p.noStroke();
+    p.fill(0,255,0,30);
+    p.rect(-10,-28,20,30);
+
+    // casco
+    p.fill(COL.knight);
+    p.rect(-5,-28,10,6);
+    // cara ranura
+    p.fill(0,150);
+    p.rect(-2,-26,4,2);
+
+    // torso
+    p.fill(COL.knight);
+    p.rect(-6,-22,12,10);
+
+    // brazos (balanceo alterno)
+    const swing = Math.sin(p.frameCount*0.3)*3;
+    p.rect(-10,-20+swing,4,8); // izquierdo
+    p.rect(6,-20-swing,4,8);   // derecho
+
+    // pantalón tipo “calzones” pixelados (guiño clásico)
+    p.fill(COL.boxer);
+    p.rect(-6,-12,12,6);
+
+    // piernas alternando
+    p.fill(COL.knight);
+    if (Math.sin(p.frameCount*0.3) > 0){
+      p.rect(-6,-6,4,8);
+      p.rect(2,-6,4,12);
+    } else {
+      p.rect(-6,-6,4,12);
+      p.rect(2,-6,4,8);
+    }
+
+    // lanza “de luz” ocasional (solo efecto)
+    if (p.frameCount % 90 < 30){
+      p.fill(255,255,0,150);
+      p.rect(10,-18,16,2);
+    }
+
+    p.pop();
+  }
+
+  // ===== FUEGOS FATUOS =====
+  function updateWisps(){
+    for (let w of wisps){
+      // trayectoria suave, flotan y titilan
+      const offx = p.sin((t*0.02)+w.phase)*8;
+      const offy = p.cos((t*0.015)+w.phase)*6;
+      const alpha = 160 + 80 * p.sin((t*0.08)+w.phase);
+      p.noStroke();
+      p.fill(255,0,255, alpha);
+      p.rect(w.x+offx, w.y+offy, w.size, w.size);
+    }
+  }
+};
+
+new p5(sketch);
+</script>
+
+</body>
+</html>

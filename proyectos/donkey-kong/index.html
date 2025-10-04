@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Donkey Kong Rampage · Retro Web</title>
+  <meta name="description" content="De la obra al pixel: saltar, trepar y esquivar barriles retro con alma española." />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    main .canvas-wrap{border:1px solid var(--border);padding:8px;background:rgba(255,255,255,0.02)}
+  </style>
+</head>
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <a class="btn" href="/portafolio.html">← Volver al portafolio</a>
+  <h1>Donkey Kong Rampage</h1>
+  <p class="lead">De la obra al pixel: saltar, trepar y esquivar barriles retro con alma española.</p>
+  <div class="canvas-wrap" id="canvas-wrap"></div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>
+
+
+<script>
+/*
+  DONKEY KONG RAMPAGE · EFECTO VISUAL (p5.js)
+  -------------------------------------------
+  Homenaje artístico a las plataformas en zig‑zag y los barriles rodando.
+  No es jugable: es un loop visual con estética de andamios neón ochenteros.
+  - Andamios diagonales, escaleras y un "héroe" estilizado subiendo en bucle.
+  - Barriles pixelados cayendo/rodando con animación simple.
+  - Pequeños destellos/luces para vibe arcade.
+  - Comentarios en español, tono humano.
+*/
+
+let sketch = (p) => {
+  // ===== PALETA RETRO =====
+  const COL = {
+    bg: p.color(0,0,0),
+    beam: p.color(255,0,255),     // magenta para andamios
+    beamGlow: p.color(255,0,255,50),
+    ladder: p.color(0,255,255),   // cian para escaleras
+    barrel: p.color(255,165,0),   // naranja barriles
+    barrelShade: p.color(255,165,0,70),
+    hero: p.color(0,255,0),       // verde héroe
+    spark: p.color(255,255,0),    // chispa amarilla
+    grid: p.color(0,255,0,30),
+  };
+
+  // ===== PLATAFORMAS, ESCALERAS, BARRILES =====
+  let beams = [];   // andamios (segmentos inclinados)
+  let ladders = []; // escaleras verticales
+  let barrels = []; // lista de barriles
+  let sparks = [];  // chispas decorativas
+  let heroT = 0;    // parámetro (0..1) para subir escaleras en loop
+
+  function canvasSize(){
+    const wrap = document.getElementById('canvas-wrap');
+    const w = Math.min(900, wrap.clientWidth - 16);
+    return [w, Math.round(w*0.62)];
+  }
+
+  p.setup = () => {
+    const [w,h] = canvasSize();
+    p.createCanvas(w,h).parent('canvas-wrap');
+    p.noSmooth();
+    buildStage();
+    // arrancamos con unos cuantos barriles "en cola"
+    for (let i=0;i<6;i++) spawnBarrel(-i*120);
+  };
+
+  p.windowResized = () => {
+    const [w,h] = canvasSize();
+    p.resizeCanvas(w,h);
+    buildStage(); // re‑construye geometría en el nuevo tamaño
+  };
+
+  function buildStage(){
+    beams = [];
+    ladders = [];
+    const rows = 5;
+    const margin = 30;
+    const spanY = (p.height - margin*2) / rows;
+    // Andamios alternando pendiente izquierda/derecha
+    for (let r=0; r<rows; r++){
+      const y = margin + r * spanY;
+      const leftToRight = r % 2 === 0;
+      const x1 = margin;
+      const x2 = p.width - margin;
+      const slope = leftToRight ? 0.15 : -0.15; // inclinación sutil
+      beams.push({
+        x1, y1: y + slope * (x1 - margin),
+        x2, y2: y + slope * (x2 - margin),
+        slope
+      });
+      // Colocamos una escalera por andamio (más o menos al medio)
+      const lx = p.lerp(x1, x2, 0.5);
+      ladders.push({
+        x: lx,
+        yTop: Math.min(y + slope*(lx - margin), y + slope*(lx - margin)) - 4,
+        yBottom: y + spanY - 10
+      });
+    }
+  }
+
+  p.draw = () => {
+    p.background(COL.bg);
+    drawScanlines();
+
+    // andamios con glow
+    for (let b of beams) drawBeam(b);
+
+    // escaleras
+    for (let L of ladders) drawLadder(L);
+
+    // héroe subiendo en bucle
+    drawHeroLoop();
+
+    // barriles
+    updateBarrels();
+
+    // pequeñas chispas decorativas (neón/maquinaria)
+    updateSparks();
+
+    // cada cierto tiempo, nace un barril nuevo
+    if (p.frameCount % 70 === 0) spawnBarrel();
+  };
+
+  // ===== DIBUJO =====
+  function drawBeam(b){
+    p.stroke(COL.beamGlow);
+    p.strokeWeight(6);
+    p.line(b.x1, b.y1, b.x2, b.y2);
+    p.stroke(COL.beam);
+    p.strokeWeight(3);
+    p.line(b.x1, b.y1, b.x2, b.y2);
+
+    // remaches pixelados a intervalos
+    p.noStroke();
+    p.fill(COL.beam);
+    const steps = 16;
+    for (let i=0;i<=steps;i++){
+      const t = i/steps;
+      const x = p.lerp(b.x1,b.x2,t);
+      const y = p.lerp(b.y1,b.y2,t);
+      if (i%2===0) p.rect(x-1,y-1,2,2);
+    }
+  }
+
+  function drawLadder(L){
+    p.stroke(COL.ladder);
+    p.strokeWeight(2);
+    const h = L.yBottom - L.yTop;
+    // largueros
+    p.line(L.x-6, L.yTop, L.x-6, L.yBottom);
+    p.line(L.x+6, L.yTop, L.x+6, L.yBottom);
+    // peldaños
+    for (let y=L.yTop; y<=L.yBottom; y+=10){
+      p.line(L.x-6, y, L.x+6, y);
+    }
+  }
+
+  function drawHeroLoop(){
+    // El héroe sube una escalera por andamio y luego corre un poco, en bucle.
+    heroT = (heroT + 0.0025) % 1;
+    // Seleccionamos la escalera según tramo del loop
+    const idx = Math.floor(heroT * ladders.length) % ladders.length;
+    const L = ladders[idx];
+    // progreso local (0..1) en la escalera actual
+    const local = (heroT * ladders.length) % 1;
+    const y = p.lerp(L.yBottom, L.yTop, local);
+    const x = L.x;
+
+    // cuerpecito pixelado verde
+    p.noStroke();
+    p.fill(COL.hero);
+    // cabeza
+    p.rect(x-2, y-14, 4, 4);
+    // tronco
+    p.rect(x-2, y-10, 4, 6);
+    // piernas alternando para simular subida
+    const step = Math.sin(p.frameCount*0.3) > 0 ? -4 : 4;
+    p.rect(x-5, y-4, 3, 6);
+    p.rect(x+2, y-4+step, 3, 6);
+
+    // pequeño brillo a su alrededor (aura arcade)
+    p.fill(0,255,0,40);
+    p.rect(x-6, y-16, 12, 20);
+  }
+
+  function updateBarrels(){
+    // Los barriles ruedan sobre andamios, bajan escaleras al llegar a la mitad y continúan.
+    for (let i=barrels.length-1; i>=0; i--){
+      const B = barrels[i];
+      // Físicas mínimas
+      B.x += B.vx;
+      // desliza sobre el andamio correspondiente
+      const b = beams[B.row];
+      // proyectamos la y según la pendiente del andamio
+      const t = (B.x - b.x1) / (b.x2 - b.x1);
+      const yOnBeam = p.lerp(b.y1, b.y2, p.constrain(t,0,1));
+      B.y = yOnBeam - 6;
+
+      // giro "visual"
+      B.rot += 0.2 * Math.sign(B.vx);
+
+      // dibujo
+      drawBarrel(B.x, B.y, B.rot);
+
+      // al llegar al final del andamio, si hay escalera cerca, bajamos
+      const L = ladders[B.row];
+      if (Math.abs(B.x - L.x) < 6 && B.row < beams.length-1){
+        // "baja" por la escalera
+        B.y += 4;
+        if (B.y > ladders[B.row].yBottom){
+          B.row++;
+          // ajustamos x a la posición de la escalera para continuar
+          B.x = ladders[B.row-1].x + (B.row%2===0? 20 : -20);
+        }
+      }
+
+      // si sale de pantalla, lo reciclamos
+      if (B.x < -40 || B.x > p.width + 40 || B.row >= beams.length){
+        barrels.splice(i,1);
+      }
+
+      // generamos chispas aleatorias
+      if (p.random() < 0.02){
+        sparks.push({x:B.x, y:B.y+8, life:20});
+      }
+    }
+  }
+
+  function drawBarrel(x,y,rot){
+    p.push();
+    p.translate(x,y);
+    p.rotate(rot);
+    // sombra/glow
+    p.noStroke();
+    p.fill(COL.barrelShade);
+    p.rect(-10,-8,20,16, 2);
+    // cuerpo
+    p.fill(COL.barrel);
+    p.rect(-9,-7,18,14, 2);
+    // aros
+    p.fill(0,120);
+    p.rect(-9,-3,18,2);
+    p.rect(-9,1,18,2);
+    // "resalte" para dar sensación de volumen
+    p.fill(255,180);
+    p.rect(4,-5,2,10);
+    p.pop();
+  }
+
+  function spawnBarrel(delay=0){
+    // Nace arriba a la izquierda/derecha según la primera pendiente
+    const first = beams[0];
+    const xStart = first.x1 + 10;
+    barrels.push({
+      x: xStart + delay, y: first.y1 - 6, vx: 2.2, rot: 0, row: 0
+    });
+  }
+
+  function updateSparks(){
+    for (let i=sparks.length-1; i>=0; i--){
+      const S = sparks[i];
+      p.noStroke();
+      p.fill(COL.spark);
+      p.rect(S.x, S.y, 2, 2);
+      S.life--;
+      if (S.life<=0) sparks.splice(i,1);
+    }
+  }
+
+  function drawScanlines(){
+    p.stroke(COL.grid);
+    for (let y=0; y<p.height; y+=4) p.line(0,y,p.width,y);
+  }
+};
+
+new p5(sketch);
+</script>
+
+</body>
+</html>

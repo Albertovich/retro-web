@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inicio · Retro Web</title>
+  <meta name="description" content="Portafolio artístico con toques retro" />
+  <meta property="og:title" content="Inicio · Retro Web" />
+  <meta property="og:description" content="Portafolio artístico con toques retro" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/assets/img/og-banner.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/assets/img/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <h1 class="glow">Retro Web</h1>
+    <p class="subtitle">Homenaje artístico al arcade de los 80</p>
+    <a class="btn cta" href="/portafolio.html">Ver Portafolio ochentañero</a>
+
+    <div class="crt">
+      <canvas id="heroCanvas" width="640" height="360" aria-label="Animación retro"></canvas>
+    </div>
+  </section>
+
+  <section class="features">
+    <h2>Estética Arcade</h2>
+    <ul class="cards">
+      <li><h3>Pixel Art</h3><p>Tipografía y UI de inspiración 8‑bit.</p></li>
+      <li><h3>Neones</h3><p>Verde, magenta y amarillo vibrantes sobre negro.</p></li>
+      <li><h3>Vibes CRT</h3><p>Efectos de scanlines y glow sutil.</p></li>
+    </ul>
+  </section>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>

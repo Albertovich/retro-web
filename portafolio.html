@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portafolio · Retro Web</title>
+  <meta name="description" content="Seis proyectos p5.js inspirados en arcades míticos" />
+  <meta property="og:title" content="Portafolio · Retro Web" />
+  <meta property="og:description" content="Seis proyectos p5.js inspirados en arcades míticos" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/assets/img/og-banner.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/assets/img/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <h1>Portafolio</h1>
+  <p class="lead">Seis mini‑proyectos en p5.js inspirados en las recreativas que marcaron los 80 en España.</p>
+  <div class="grid projects">
+<article class="project">
+  <h3>Space Invaders Recharged</h3>
+  <p>Los marcianitos nunca pasan de moda, pero ahora disparan con ritmo ochentañero.</p>
+  <a class="btn" href="/proyectos/space-invaders/">Abrir demo</a>
+</article>
+<article class="project">
+  <h3>Pac-Man Remix</h3>
+  <p>El laberinto sigue ahí, pero los fantasmas ahora bailan synthwave.</p>
+  <a class="btn" href="/proyectos/pacman/">Abrir demo</a>
+</article>
+<article class="project">
+  <h3>Donkey Kong Rampage</h3>
+  <p>De la obra al pixel: saltar, trepar y esquivar barriles retro con alma española.</p>
+  <a class="btn" href="/proyectos/donkey-kong/">Abrir demo</a>
+</article>
+<article class="project">
+  <h3>Galaga Reloaded</h3>
+  <p>Defiende la galaxia desde tu recreativa favorita, ahora con neones fosforitos.</p>
+  <a class="btn" href="/proyectos/galaga/">Abrir demo</a>
+</article>
+<article class="project">
+  <h3>Ghosts’n Goblins Revival</h3>
+  <p>Sir Arthur vuelve, en calzoncillos pixelados, a enfrentarse a demonios imposibles.</p>
+  <a class="btn" href="/proyectos/ghosts-goblins/">Abrir demo</a>
+</article>
+<article class="project">
+  <h3>Out Run Neo80</h3>
+  <p>Coge el Ferrari, pisa a fondo y recorre carreteras llenas de sol, palmeras y nostalgia.</p>
+  <a class="btn" href="/proyectos/outrun/">Abrir demo</a>
+</article>
+  </div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>

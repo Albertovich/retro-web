@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Galaga Reloaded · Retro Web</title>
+  <meta name="description" content="Defiende la galaxia desde tu recreativa favorita, ahora con neones fosforitos." />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    main .canvas-wrap{border:1px solid var(--border);padding:8px;background:rgba(255,255,255,0.02)}
+  </style>
+</head>
+<body>
+<header class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/"><img class="brand-logo" src="/assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-desktop">
+      <a href="/">Inicio</a>
+      <a href="/sobre.html">Sobre mí</a>
+      <a href="/portafolio.html">Portafolio</a>
+      <a href="/contacto.html">Contacto</a>
+    </nav>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" hidden>
+    <a href="/">Inicio</a>
+    <a href="/sobre.html">Sobre mí</a>
+    <a href="/portafolio.html">Portafolio</a>
+    <a href="/contacto.html">Contacto</a>
+  </nav>
+</header>
+
+<main class="container page">
+  <a class="btn" href="/portafolio.html">← Volver al portafolio</a>
+  <h1>Galaga Reloaded</h1>
+  <p class="lead">Defiende la galaxia desde tu recreativa favorita, ahora con neones fosforitos.</p>
+  <div class="canvas-wrap" id="canvas-wrap"></div>
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
+    <div class="socials">
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/script.js"></script>
+</body>
+</html>
+
+
+<script>
+/*
+  GALAGA RELOADED · EFECTO VISUAL (p5.js)
+  ---------------------------------------
+  Homenaje visual: formación de naves enemigas, barridos y picados
+  en patrones "V" y "S", disparos y estelas. No es jugable: loop estético.
+  Comentarios en español, con cariño por el arcade 80s.
+*/
+
+let sketch = (p) => {
+  // ===== COLORES Y ESTÉTICA =====
+  const COL = {
+    bg: p.color(0,0,0),
+    starA: p.color(255,0,255,150),
+    starB: p.color(0,255,0,150),
+    starC: p.color(255,255,0,150),
+    enemy: p.color(0,255,255),
+    enemy2: p.color(255,0,255),
+    player: p.color(0,255,0),
+    bullet: p.color(255,255,0),
+    trail: p.color(0,255,255,60),
+    scan: p.color(0,255,0,40)
+  };
+
+  let stars = [];
+  let formation = []; // naves en formación
+  let flyers = [];    // naves que salen a hacer maniobras
+  let bullets = [];   // disparos en vertical
+  let t = 0;
+
+  function canvasSize() {
+    const wrap = document.getElementById('canvas-wrap');
+    const w = Math.min(900, wrap.clientWidth - 16);
+    return [w, Math.round(w * 0.62)];
+  }
+
+  p.setup = () => {
+    const [w,h] = canvasSize();
+    p.createCanvas(w,h).parent('canvas-wrap');
+    p.noSmooth();
+
+    // Campo de estrellas suave, con parallax
+    for (let i=0;i<160;i++){
+      stars.push({x:p.random(w), y:p.random(h), z:p.random(1,3)});
+    }
+
+    // Formación rectangular de “enemigos”
+    const rows = 4, cols = 9;
+    const margin = 60;
+    const cellW = (w - margin*2) / (cols-1);
+    const cellH = 28;
+    for (let r=0;r<rows;r++){
+      for (let c=0;c<cols;c++){
+        formation.push({
+          fx: margin + c*cellW,
+          fy: margin + r*cellH + 40,
+          phase: p.random(1000),
+          colAlt: (r+c)%2===0
+        });
+      }
+    }
+  };
+
+  p.windowResized = () => {
+    const [w,h] = canvasSize();
+    p.resizeCanvas(w,h);
+  };
+
+  p.draw = () => {
+    p.background(COL.bg);
+    drawStars();
+
+    // Scanlines suaves
+    p.stroke(COL.scan);
+    for (let y=0; y<p.height; y+=4) p.line(0,y,p.width,y);
+
+    // Formación que vibra un poquito para que parezca viva
+    for (let e of formation){
+      const x = e.fx + p.sin((t + e.phase)*0.04)*4;
+      const y = e.fy + p.cos((t + e.phase)*0.03)*2;
+      drawEnemy(x,y, e.colAlt? COL.enemy : COL.enemy2);
+      // De vez en cuando, una nave se suelta a volar
+      if (p.random() < 0.0008) launchFlyer(x,y, e.colAlt? COL.enemy : COL.enemy2);
+    }
+
+    // Actualizamos las naves en maniobra
+    updateFlyers();
+
+    // Disparos verticales desde la parte superior (estética)
+    if (p.frameCount % 12 === 0){
+      bullets.push({x:p.random(p.width), y:-10, v: 6 + p.random(4)});
+    }
+    updateBullets();
+
+    // Nave del jugador (estática con levitación, centrada abajo)
+    const px = p.width*0.5 + p.sin(t*0.03)*10;
+    const py = p.height - 30 + p.sin(t*0.07)*2;
+    drawPlayer(px,py);
+
+    t++;
+  };
+
+  // ===== ESTRELLAS =====
+  function drawStars(){
+    for (let s of stars){
+      s.y += 0.15 * s.z;
+      if (s.y > p.height) s.y = 0;
+      let col = COL.starA;
+      if (s.z>2.3) col = COL.starB;
+      else if (s.z>1.6) col = COL.starC;
+      p.noStroke();
+      p.fill(col);
+      p.rect(Math.round(s.x), Math.round(s.y), s.z, s.z);
+    }
+  }
+
+  // ===== ENEMIGOS =====
+  function drawEnemy(x,y, col){
+    // cuerpo
+    p.noStroke();
+    p.fill(col);
+    p.rect(x-6, y-4, 12, 8);
+    // alas
+    p.rect(x-10, y-2, 6, 4);
+    p.rect(x+4,  y-2, 6, 4);
+    // cabina/glow
+    p.fill(0,200);
+    p.rect(x-2, y-2, 4, 4);
+  }
+
+  function launchFlyer(x,y,col){
+    // Decide una maniobra: V, S o picado
+    const type = p.random() < 0.4 ? 'V' : (p.random()<0.7 ? 'S' : 'DIVE');
+    flyers.push({
+      x, y, col, type,
+      life: 200,
+      t: 0, // parámetro [0..1]
+      vx: (p.random()<0.5?-1:1) * p.random(2,3),
+    });
+  }
+
+  function updateFlyers(){
+    for (let i=flyers.length-1;i>=0;i--){
+      const F = flyers[i];
+      F.t += 0.01;
+      F.life--;
+      // trayectoria
+      if (F.type === 'V'){
+        // baja en V hacia el centro y sube
+        const cx = p.width/2;
+        const amp = 80;
+        F.x += F.vx;
+        F.y = F.y + 2 + p.sin(F.t*Math.PI)*2;
+        // estela ligera
+        drawTrail(F.x, F.y);
+      } else if (F.type === 'S'){
+        F.x += F.vx * 1.5;
+        F.y += p.sin(F.t*6)*3 + 1.8;
+        drawTrail(F.x, F.y);
+      } else { // DIVE
+        F.x += F.vx*0.6;
+        F.y += 4.2;
+        drawTrail(F.x, F.y);
+      }
+
+      // dibujar
+      drawEnemy(F.x, F.y, F.col);
+
+      if (F.life<=0 || F.y>p.height+20 || F.x<-30 || F.x>p.width+30){
+        flyers.splice(i,1);
+      }
+    }
+  }
+
+  function drawTrail(x,y){
+    p.noStroke();
+    p.fill(COL.trail);
+    p.rect(x-2, y-2, 4, 4);
+  }
+
+  // ===== DISPAROS =====
+  function updateBullets(){
+    p.noStroke();
+    for (let i=bullets.length-1;i>=0;i--){
+      const B = bullets[i];
+      p.fill(COL.bullet);
+      p.rect(B.x, B.y, 2, 8);
+      p.fill(255,255,0,80);
+      p.rect(B.x-1, B.y, 1, 8);
+      p.rect(B.x+2, B.y, 1, 8);
+      B.y += B.v;
+      if (B.y > p.height+10) bullets.splice(i,1);
+    }
+  }
+
+  // ===== JUGADOR =====
+  function drawPlayer(x,y){
+    // pequeña nave triangular "player"
+    p.noStroke();
+    // glow
+    p.fill(0,255,0,40);
+    p.rect(x-10,y-8,20,16);
+    // cuerpo
+    p.fill(COL.player);
+    p.rect(x-8,y-4,16,8);
+    p.rect(x-2,y-8,4,4);
+    // alas
+    p.rect(x-12,y-2,4,4);
+    p.rect(x+8,y-2,4,4);
+  }
+};
+
+new p5(sketch);
+</script>
+
+</body>
+</html>
