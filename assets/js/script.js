@@ -33,11 +33,11 @@ if (botonMenu && menuMovil) {
   const canvas = document.getElementById('heroCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const proporcion = 16 / 9;
+  const proporcion = 4 / 3;
 
   // Ajusta el tamaño del canvas según el ancho disponible
   const redimensionar = () => {
-    const ancho = Math.min(canvas.parentElement?.clientWidth || 640, 640);
+    const ancho = Math.min(canvas.parentElement?.clientWidth || 520, 520);
     const alto = Math.round(ancho / proporcion);
     canvas.width = ancho;
     canvas.height = alto;
