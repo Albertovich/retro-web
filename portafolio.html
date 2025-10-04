@@ -1,89 +1,87 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <!-- Cabecera mínima con metadatos básicos -->
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Portafolio · Retro Web</title>
-  <meta name="description" content="Seis proyectos p5.js inspirados en arcades míticos" />
-  <meta property="og:title" content="Portafolio · Retro Web" />
-  <meta property="og:description" content="Seis proyectos p5.js inspirados en arcades míticos" />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="./assets/img/og-banner.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <link rel="icon" href="./assets/img/favicon.svg" type="image/svg+xml" />
-  <link rel="alternate icon" type="image/png" href="data:image/png;base64,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" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
-
 <body>
-<header class="navbar" id="navbar">
-  <div class="container nav-inner">
-    <a class="brand" href="./"><img class="brand-logo" src="./assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
-    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="nav-desktop">
+  <!-- Barra de navegación reutilizable -->
+  <header class="barra" id="navbar">
+    <div class="contenedor barra__contenido">
+      <a class="marca" href="./">
+        <img class="marca__logo" src="./assets/img/logo.png" alt="Retro Web" />
+        <span class="marca__texto">Retro Web</span>
+      </a>
+      <button class="menu" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="enlaces">
+        <a href="./">Inicio</a>
+        <a href="./sobre.html">Sobre mí</a>
+        <a href="./portafolio.html">Portafolio</a>
+        <a href="./contacto.html">Contacto</a>
+      </nav>
+    </div>
+    <nav class="enlaces enlaces--movil" id="mobileMenu" hidden>
       <a href="./">Inicio</a>
       <a href="./sobre.html">Sobre mí</a>
       <a href="./portafolio.html">Portafolio</a>
       <a href="./contacto.html">Contacto</a>
     </nav>
-  </div>
-  <nav class="nav-mobile" id="mobileMenu" hidden>
-    <a href="./">Inicio</a>
-    <a href="./sobre.html">Sobre mí</a>
-    <a href="./portafolio.html">Portafolio</a>
-    <a href="./contacto.html">Contacto</a>
-  </nav>
-</header>
+  </header>
 
-<main class="container page">
-  <h1>Portafolio</h1>
-  <p class="lead">Seis mini‑proyectos en p5.js inspirados en las recreativas que marcaron los 80 en España.</p>
-  <div class="grid projects">
-<article class="project">
-  <h3>Space Invaders Recharged</h3>
-  <p>Los marcianitos nunca pasan de moda, pero ahora disparan con ritmo ochentañero.</p>
-  <a class="btn" href="./proyectos/space-invaders/">Abrir demo</a>
-</article>
-<article class="project">
-  <h3>Pac-Man Remix</h3>
-  <p>El laberinto sigue ahí, pero los fantasmas ahora bailan synthwave.</p>
-  <a class="btn" href="./proyectos/pacman/">Abrir demo</a>
-</article>
-<article class="project">
-  <h3>Donkey Kong Rampage</h3>
-  <p>De la obra al pixel: saltar, trepar y esquivar barriles retro con alma española.</p>
-  <a class="btn" href="./proyectos/donkey-kong/">Abrir demo</a>
-</article>
-<article class="project">
-  <h3>Galaga Reloaded</h3>
-  <p>Defiende la galaxia desde tu recreativa favorita, ahora con neones fosforitos.</p>
-  <a class="btn" href="./proyectos/galaga/">Abrir demo</a>
-</article>
-<article class="project">
-  <h3>Ghosts’n Goblins Revival</h3>
-  <p>Sir Arthur vuelve, en calzoncillos pixelados, a enfrentarse a demonios imposibles.</p>
-  <a class="btn" href="./proyectos/ghosts-goblins/">Abrir demo</a>
-</article>
-<article class="project">
-  <h3>Out Run Neo80</h3>
-  <p>Coge el Ferrari, pisa a fondo y recorre carreteras llenas de sol, palmeras y nostalgia.</p>
-  <a class="btn" href="./proyectos/outrun/">Abrir demo</a>
-</article>
-  </div>
-</main>
-<footer class="footer">
-  <div class="container footer-inner">
-    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
-    <div class="socials">
-      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+  <!-- Listado de proyectos destacados -->
+  <main class="contenedor pagina">
+    <h1>Portafolio</h1>
+    <p class="lead">Seis mini proyectos p5.js inspirados en recreativas míticas de los 80.</p>
+    <section class="rejilla">
+      <article>
+        <h3>Space Invaders Recharged</h3>
+        <p>Marcianitos con ritmo ochentañero y brillo neón.</p>
+        <a class="boton" href="./proyectos/space-invaders/">Abrir demo</a>
+      </article>
+      <article>
+        <h3>Pac-Man Remix</h3>
+        <p>El laberinto clásico al compás del synthwave.</p>
+        <a class="boton" href="./proyectos/pacman/">Abrir demo</a>
+      </article>
+      <article>
+        <h3>Donkey Kong Rampage</h3>
+        <p>Aventuras de barriles con alma de recreativa.</p>
+        <a class="boton" href="./proyectos/donkey-kong/">Abrir demo</a>
+      </article>
+      <article>
+        <h3>Galaga Reloaded</h3>
+        <p>Defiende la galaxia entre luces fosforitas.</p>
+        <a class="boton" href="./proyectos/galaga/">Abrir demo</a>
+      </article>
+      <article>
+        <h3>Ghosts’n Goblins Revival</h3>
+        <p>Sir Arthur vuelve a por demonios imposibles.</p>
+        <a class="boton" href="./proyectos/ghosts-goblins/">Abrir demo</a>
+      </article>
+      <article>
+        <h3>Out Run Neo80</h3>
+        <p>Ferrari rojo, palmeras y puestas de sol retro.</p>
+        <a class="boton" href="./proyectos/outrun/">Abrir demo</a>
+      </article>
+    </section>
+  </main>
+
+  <!-- Pie de página con redes -->
+  <footer class="pie">
+    <div class="contenedor pie__contenido">
+      <p>© <span id="year"></span> Retro Web. Vibes arcade.</p>
+      <div class="pie__redes">
+        <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
     </div>
-  </div>
-</footer>
-<script src="./assets/js/script.js"></script>
+  </footer>
+  <script src="./assets/js/script.js"></script>
 </body>
 </html>
