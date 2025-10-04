@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <rect width="32" height="32" fill="none"/>
+  <!-- Antennas -->
+  <rect x="7" y="2" width="2" height="2" fill="#ff38b7"/>
+  <rect x="23" y="2" width="2" height="2" fill="#ff38b7"/>
+  <rect x="6" y="4" width="4" height="2" fill="#32ff6a"/>
+  <rect x="22" y="4" width="4" height="2" fill="#32ff6a"/>
+  <rect x="8" y="6" width="2" height="2" fill="#1fcc55"/>
+  <rect x="22" y="6" width="2" height="2" fill="#1fcc55"/>
+  <!-- Head -->
+  <rect x="6" y="6" width="20" height="8" fill="#32ff6a"/>
+  <rect x="8" y="8" width="16" height="4" fill="#1fcc55"/>
+  <!-- Eyes -->
+  <rect x="9" y="10" width="4" height="2" fill="#0b0b0b"/>
+  <rect x="19" y="10" width="4" height="2" fill="#0b0b0b"/>
+  <rect x="10" y="10" width="2" height="1" fill="#94ffef"/>
+  <rect x="20" y="10" width="2" height="1" fill="#94ffef"/>
+  <rect x="11" y="11" width="1" height="1" fill="#ffea83"/>
+  <rect x="21" y="11" width="1" height="1" fill="#ffea83"/>
+  <!-- Brow ridge -->
+  <rect x="6" y="8" width="20" height="2" fill="#32ff6a" opacity="0.6"/>
+  <!-- Cheek lights -->
+  <rect x="6" y="12" width="2" height="2" fill="#ffea83"/>
+  <rect x="24" y="12" width="2" height="2" fill="#ffea83"/>
+  <!-- Arms -->
+  <rect x="4" y="12" width="2" height="6" fill="#32ff6a"/>
+  <rect x="26" y="12" width="2" height="6" fill="#32ff6a"/>
+  <rect x="2" y="14" width="2" height="2" fill="#ff38b7"/>
+  <rect x="28" y="14" width="2" height="2" fill="#ff38b7"/>
+  <rect x="3" y="16" width="2" height="2" fill="#32ff6a"/>
+  <rect x="27" y="16" width="2" height="2" fill="#32ff6a"/>
+  <!-- Torso -->
+  <rect x="8" y="14" width="16" height="6" fill="#32ff6a"/>
+  <rect x="10" y="16" width="12" height="2" fill="#1fcc55"/>
+  <!-- Belt -->
+  <rect x="8" y="19" width="16" height="2" fill="#0b0b0b"/>
+  <rect x="10" y="19" width="12" height="2" fill="#ffe864"/>
+  <rect x="14" y="19" width="4" height="2" fill="#ff38b7" opacity="0.8"/>
+  <!-- Legs -->
+  <rect x="10" y="21" width="4" height="6" fill="#32ff6a"/>
+  <rect x="18" y="21" width="4" height="6" fill="#32ff6a"/>
+  <rect x="10" y="25" width="4" height="2" fill="#1fcc55"/>
+  <rect x="18" y="25" width="4" height="2" fill="#1fcc55"/>
+  <!-- Boots -->
+  <rect x="9" y="27" width="6" height="2" fill="#ff38b7"/>
+  <rect x="17" y="27" width="6" height="2" fill="#ff38b7"/>
+  <rect x="8" y="29" width="8" height="2" fill="#ffea83"/>
+  <rect x="16" y="29" width="8" height="2" fill="#ffea83"/>
+  <!-- Ground shadow -->
+  <rect x="8" y="31" width="16" height="1" fill="#0b0b0b" opacity="0.3"/>
+</svg>
