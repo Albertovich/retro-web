@@ -6,28 +6,29 @@
   <title>Galaga Reloaded · Retro Web</title>
   <meta name="description" content="Defiende la galaxia desde tu recreativa favorita, ahora con neones fosforitos." />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="../../assets/css/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
   <style>
-    main .canvas-wrap{border:1px solid var(--border);padding:8px;background:rgba(255,255,255,0.02)}
+    main .canvas-wrap { border: 1px solid var(--borde); padding: 8px; background: rgba(255, 255, 255, 0.02); }
   </style>
 </head>
 <body>
-<header class="navbar" id="navbar">
-  <div class="container nav-inner">
-    <a class="brand" href="../../index.html"><img class="brand-logo" src="../../assets/img/logo.png" alt="Retro Web" /><span class="brand-text">Retro Web</span></a>
-    <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+<header class="barra" id="navbar">
+  <div class="contenedor barra__contenido">
+    <a class="marca" href="../../index.html">
+      <span class="marca__texto">Retro Web</span>
+    </a>
+    <button class="menu" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
       <span></span><span></span><span></span>
     </button>
-    <nav class="nav-desktop">
+    <nav class="enlaces">
       <a href="../../index.html">Inicio</a>
       <a href="../../sobre.html">Sobre mí</a>
       <a href="../../portafolio.html">Portafolio</a>
       <a href="../../contacto.html">Contacto</a>
     </nav>
   </div>
-  <nav class="nav-mobile" id="mobileMenu" hidden>
+  <nav class="enlaces enlaces--movil" id="mobileMenu" hidden>
     <a href="../../index.html">Inicio</a>
     <a href="../../sobre.html">Sobre mí</a>
     <a href="../../portafolio.html">Portafolio</a>
@@ -35,16 +36,16 @@
   </nav>
 </header>
 
-<main class="container page">
-  <a class="btn" href="../../portafolio.html">← Volver al portafolio</a>
+<main class="contenedor pagina">
+  <a class="boton" href="../../portafolio.html">← Volver al portafolio</a>
   <h1>Galaga Reloaded</h1>
   <p class="lead">Defiende la galaxia desde tu recreativa favorita, ahora con neones fosforitos.</p>
   <div class="canvas-wrap" id="canvas-wrap"></div>
 </main>
-<footer class="footer">
-  <div class="container footer-inner">
-    <p>© <span id="year"></span> Retro Web · Hecho por Alberto con vibes arcade de los 80.</p>
-    <div class="socials">
+<footer class="pie">
+  <div class="contenedor pie__contenido">
+    <p>© <span id="year"></span> Retro Web. Vibes arcade.</p>
+    <div class="pie__redes">
       <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
     </div>
