@@ -63,13 +63,10 @@ a {
   text-decoration: none;
 }
 
-.marca__logo {
-  width: 28px;
-  height: 28px;
-  border: 2px solid #000;
-  image-rendering: pixelated;
-  box-shadow: 0 0 10px var(--verde);
-  background: #000;
+.marca__texto {
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 /* Navegación horizontal */
@@ -123,36 +120,26 @@ a {
 /* Sección hero */
 .hero {
   display: grid;
-  gap: 20px;
-  place-items: center;
+  gap: 24px;
+  justify-items: center;
   text-align: center;
-  padding: 40px 0 20px;
+  padding: 48px 0 24px;
+}
+
+.hero__intro {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
 }
 
 .hero__texto {
   opacity: 0.9;
-}
-
-.hero__texto,
-.hero .boton {
   max-width: 520px;
 }
 
-.hero__figura {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-}
-
-.hero__figura img {
-  width: 180px;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 0 6px var(--magenta));
-}
-
-.hero__figura figcaption {
-  font-size: 0.65rem;
-  color: var(--amarillo);
+.hero .boton {
+  width: 100%;
+  max-width: 320px;
 }
 
 /* Botones principales */
@@ -172,6 +159,28 @@ a {
 .boton:hover {
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0 #000;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+    text-align: left;
+    justify-items: start;
+  }
+
+  .hero__intro {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .hero__texto,
+  .hero .boton {
+    max-width: 520px;
+  }
+
+  .hero .boton {
+    width: auto;
+  }
 }
 
 /* Efecto de brillo en el título */
@@ -300,10 +309,9 @@ a {
 }
 
 .rejilla {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  justify-content: center;
-  justify-items: center;
+  justify-items: stretch;
 }
 
 .tarjetas li,
@@ -316,7 +324,30 @@ a {
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
   text-align: center;
   width: 100%;
-  max-width: 300px;
+}
+
+@media (max-width: 960px) {
+  .rejilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-top: 36px;
+  }
+
+  .hero__texto {
+    max-width: 100%;
+  }
+
+  .hero .boton {
+    width: 100%;
+  }
+
+  .rejilla {
+    grid-template-columns: 1fr;
+  }
 }
 
 .rejilla h3 {
@@ -417,9 +448,4 @@ a {
   .menu { display: block; }
   .enlaces--movil[aria-hidden="false"],
   .enlaces--movil:not([hidden]) { display: flex; }
-}
-
-@media (max-width: 480px) {
-  .hero__figura img { width: 140px; }
-  .hero__figura figcaption { font-size: 0.55rem; }
 }
