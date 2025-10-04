@@ -34,8 +34,22 @@ if (hamburger && mobileMenu) {
   const cvs = document.getElementById('heroCanvas');
   if(!cvs) return;
   const ctx = cvs.getContext('2d');
+  const aspectRatio = 16 / 9;
+  function resizeCanvas(){
+    const parentWidth = cvs.parentElement ? cvs.parentElement.clientWidth : 0;
+    const availableWidth = parentWidth || cvs.clientWidth || 640;
+    const width = Math.max(1, Math.min(availableWidth, 640));
+    const height = Math.max(1, Math.round(width / aspectRatio));
+    if(cvs.width !== width || cvs.height !== height){
+      cvs.width = width;
+      cvs.height = height;
+    }
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
   let t=0;
   function loop(){
+    resizeCanvas();
     const w=cvs.width, h=cvs.height;
     ctx.fillStyle = '#000';
     ctx.fillRect(0,0,w,h);
