@@ -72,3 +72,44 @@ if (botonMenu && menuMovil) {
 
   dibujar();
 })();
+
+// --- Visor interactivo para la página de portafolio ---
+(() => {
+  const visor = document.querySelector('[data-portafolio-visor]');
+  const items = document.querySelectorAll('[data-portafolio-item]');
+  if (!visor || !items.length) return;
+
+  const iframe = visor.querySelector('iframe');
+  const titulo = document.getElementById('portafolioPreviewTitle');
+  const descripcion = document.getElementById('portafolioPreviewDescripcion');
+
+  const activar = (item) => {
+    items.forEach((elemento) => elemento.classList.toggle('activo', elemento === item));
+    const { src, title, description } = item.dataset;
+
+    if (iframe && src && iframe.getAttribute('src') !== src) {
+      iframe.setAttribute('src', src);
+    }
+
+    if (iframe && title) {
+      iframe.setAttribute('title', `Demo p5.js: ${title}`);
+    }
+
+    if (titulo && title) {
+      titulo.textContent = title;
+    }
+
+    if (descripcion) {
+      descripcion.textContent = description || '';
+    }
+  };
+
+  items.forEach((item) => {
+    const boton = item.querySelector('button');
+    if (!boton) return;
+
+    boton.addEventListener('click', () => activar(item));
+  });
+
+  activar(items[0]);
+})();

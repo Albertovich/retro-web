@@ -32,41 +32,162 @@
     </nav>
   </header>
 
-  <!-- Listado de proyectos destacados -->
-  <main class="contenedor pagina">
-    <h1>Portafolio</h1>
-    <p class="lead">Seis mini proyectos p5.js inspirados en recreativas míticas de los 80.</p>
-    <section class="rejilla">
-      <article>
-        <h3>Space Invaders Recharged</h3>
-        <p>Marcianitos con ritmo ochentañero y brillo neón.</p>
-        <a class="boton" href="./proyectos/space-invaders/">Abrir demo</a>
-      </article>
-      <article>
-        <h3>Pac-Man Remix</h3>
-        <p>El laberinto clásico al compás del synthwave.</p>
-        <a class="boton" href="./proyectos/pacman/">Abrir demo</a>
-      </article>
-      <article>
-        <h3>Donkey Kong Rampage</h3>
-        <p>Aventuras de barriles con alma de recreativa.</p>
-        <a class="boton" href="./proyectos/donkey-kong/">Abrir demo</a>
-      </article>
-      <article>
-        <h3>Galaga Reloaded</h3>
-        <p>Defiende la galaxia entre luces fosforitas.</p>
-        <a class="boton" href="./proyectos/galaga/">Abrir demo</a>
-      </article>
-      <article>
-        <h3>Ghosts’n Goblins Revival</h3>
-        <p>Sir Arthur vuelve a por demonios imposibles.</p>
-        <a class="boton" href="./proyectos/ghosts-goblins/">Abrir demo</a>
-      </article>
-      <article>
-        <h3>Out Run Neo80</h3>
-        <p>Ferrari rojo, palmeras y puestas de sol retro.</p>
-        <a class="boton" href="./proyectos/outrun/">Abrir demo</a>
-      </article>
+  <!-- Portafolio interactivo con visor centrado -->
+  <main class="contenedor pagina pagina--portafolio">
+    <header class="portafolio__encabezado">
+      <h1 id="portafolioTitulo">Portafolio p5.js</h1>
+      <p class="lead">
+        Descubre seis mini demos inspiradas en los salones arcade de los 80. Selecciona un proyecto
+        para verlo en el visor central y lánzate a jugar en pantalla completa cuando quieras.
+      </p>
+    </header>
+
+    <section class="portafolio__area" aria-labelledby="portafolioTitulo">
+      <div class="portafolio__visor" data-portafolio-visor>
+        <h2 id="portafolioPreviewTitle" class="portafolio__titulo">Space Invaders Recharged</h2>
+        <p id="portafolioPreviewDescripcion" class="portafolio__descripcion">
+          Marcianitos con ritmo ochentañero y brillo neón.
+        </p>
+        <div class="portafolio__pantalla">
+          <iframe
+            src="./proyectos/space-invaders/index.html"
+            title="Demo p5.js: Space Invaders Recharged"
+            loading="lazy"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <div class="portafolio__lista-contenedor">
+        <ul class="portafolio__lista" role="list">
+          <li
+            class="portafolio__item activo"
+            data-portafolio-item
+            data-src="./proyectos/space-invaders/index.html"
+            data-title="Space Invaders Recharged"
+            data-description="Marcianitos con ritmo ochentañero y brillo neón."
+          >
+            <button type="button" class="portafolio__selector">
+              <span class="portafolio__nombre">Space Invaders Recharged</span>
+              <span class="portafolio__resumen">Marcianitos con ritmo ochentañero y brillo neón.</span>
+              <span class="portafolio__etiquetas">Shoot’em up · Flujo neón</span>
+            </button>
+            <a
+              class="boton boton--secundario"
+              href="./proyectos/space-invaders/"
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir demo completa
+            </a>
+          </li>
+          <li
+            class="portafolio__item"
+            data-portafolio-item
+            data-src="./proyectos/pacman/index.html"
+            data-title="Pac-Man Remix"
+            data-description="El laberinto clásico al compás del synthwave."
+          >
+            <button type="button" class="portafolio__selector">
+              <span class="portafolio__nombre">Pac-Man Remix</span>
+              <span class="portafolio__resumen">El laberinto clásico al compás del synthwave.</span>
+              <span class="portafolio__etiquetas">Maze · Synthwave</span>
+            </button>
+            <a
+              class="boton boton--secundario"
+              href="./proyectos/pacman/"
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir demo completa
+            </a>
+          </li>
+          <li
+            class="portafolio__item"
+            data-portafolio-item
+            data-src="./proyectos/donkey-kong/index.html"
+            data-title="Donkey Kong Rampage"
+            data-description="Aventuras de barriles con alma de recreativa."
+          >
+            <button type="button" class="portafolio__selector">
+              <span class="portafolio__nombre">Donkey Kong Rampage</span>
+              <span class="portafolio__resumen">Aventuras de barriles con alma de recreativa.</span>
+              <span class="portafolio__etiquetas">Plataformas · 8 bits</span>
+            </button>
+            <a
+              class="boton boton--secundario"
+              href="./proyectos/donkey-kong/"
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir demo completa
+            </a>
+          </li>
+          <li
+            class="portafolio__item"
+            data-portafolio-item
+            data-src="./proyectos/galaga/index.html"
+            data-title="Galaga Reloaded"
+            data-description="Defiende la galaxia entre luces fosforitas."
+          >
+            <button type="button" class="portafolio__selector">
+              <span class="portafolio__nombre">Galaga Reloaded</span>
+              <span class="portafolio__resumen">Defiende la galaxia entre luces fosforitas.</span>
+              <span class="portafolio__etiquetas">Arcade espacial · Ritmo rápido</span>
+            </button>
+            <a
+              class="boton boton--secundario"
+              href="./proyectos/galaga/"
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir demo completa
+            </a>
+          </li>
+          <li
+            class="portafolio__item"
+            data-portafolio-item
+            data-src="./proyectos/ghosts-goblins/index.html"
+            data-title="Ghosts’n Goblins Revival"
+            data-description="Sir Arthur vuelve a por demonios imposibles."
+          >
+            <button type="button" class="portafolio__selector">
+              <span class="portafolio__nombre">Ghosts’n Goblins Revival</span>
+              <span class="portafolio__resumen">Sir Arthur vuelve a por demonios imposibles.</span>
+              <span class="portafolio__etiquetas">Acción · Dificultad retro</span>
+            </button>
+            <a
+              class="boton boton--secundario"
+              href="./proyectos/ghosts-goblins/"
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir demo completa
+            </a>
+          </li>
+          <li
+            class="portafolio__item"
+            data-portafolio-item
+            data-src="./proyectos/outrun/index.html"
+            data-title="Out Run Neo80"
+            data-description="Ferrari rojo, palmeras y puestas de sol retro."
+          >
+            <button type="button" class="portafolio__selector">
+              <span class="portafolio__nombre">Out Run Neo80</span>
+              <span class="portafolio__resumen">Ferrari rojo, palmeras y puestas de sol retro.</span>
+              <span class="portafolio__etiquetas">Carreras · Sunset vibes</span>
+            </button>
+            <a
+              class="boton boton--secundario"
+              href="./proyectos/outrun/"
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir demo completa
+            </a>
+          </li>
+        </ul>
+      </div>
     </section>
   </main>
 
